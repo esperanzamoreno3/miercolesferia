@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta Miércoles de Feria - Caseta El Resucitado</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle, #2e1065 0%, #0f051d 100%);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 24px 16px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .logo-header {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 10px;
+      display: block;
+      cursor: pointer;
+      border: 2px solid #ffd700;
+    }
+    h1 {
+      font-size: 1.35rem;
+      color: #ffd700;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .dia-tag {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 5px 14px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(168,85,247,0.3);
+    }
+    .wheel-container {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 12px auto;
+    }
+    #wheel {
+      width: 100%;
+      height: 100%;
+    }
+    .pointer {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 26px solid #ff3b30;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+      z-index: 10;
+    }
+    .btn {
+      background: linear-gradient(135deg, #eab308, #ca8a04);
+      color: #111;
+      font-weight: 800;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 14px;
+      box-shadow: 0 4px 14px rgba(234,179,8,0.4);
+      transition: opacity 0.2s;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #resultado {
+      margin-top: 16px;
+      min-height: 24px;
+    }
+    .admin-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 16px;
+    }
+    .admin-content {
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <img src="IMG_5861.jpg" alt="Caseta El Resucitado" class="logo-header" id="adminTrigger">
+  <h1>RULETA EL RESUCITADO</h1>
+  <div class="dia-tag">MIÉRCOLES DE FERIA</div>
+  <p style="font-size: 0.88rem; color: #ddd; margin-bottom: 14px;">¡Gira y prueba tu suerte en la barra!</p>
+
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="560" height="560"></canvas>
+  </div>
+
+  <button class="btn" id="spinBtn" onclick="girarRuleta()">¡PROBAR SUERTE!</button>
+  <div id="resultado"></div>
+
+  <footer style="margin-top: 18px; font-size: 0.72rem; color: rgba(255,255,255,0.4); letter-spacing: 0.5px;">
+    Desarrollado por <strong style="color: rgba(255,215,0,0.65);">Esperanza Moreno</strong>
+  </footer>
+</div>
+
+<div class="admin-modal" id="adminModal">
+  <div class="admin-content">
+    <h3 style="color:#ffd700; margin-bottom:12px;">🛡️ Panel Administrador</h3>
+    <button class="btn" style="background:#22c55e; color:#fff; margin-bottom:10px;" onclick="activarPremioForzado()">Forzar Premio en este Móvil</button>
+    <button class="btn" style="background:#555; color:#fff;" onclick="cerrarAdmin()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+  // Pega aquí la URL que copiaste de Google Apps Script:
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYsVtkMdx3pQLdSsY7nptXxdbyGHHiyUnLHTVd9nP06AHrIiTQSO-jbqwwh99c3JzTzw/exec";
+  const PIN_ADMIN = "2024";
+
+  const sectores = [
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "1 CHUPITO", color: "#7c3aed", type: "chupito" },
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "-2€ CUBATA", color: "#2563eb", type: "dto_cubata" },
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "CUBATA GRATIS", color: "#ca8a04", type: "cubata_gratis" },
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "-1,50€ REBUJITO", color: "#059669", type: "dto_rebujito" }
+  ];
+
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+  const spinBtn = document.getElementById("spinBtn");
+  const resDiv = document.getElementById("resultado");
+  let currentAngle = 0;
+  let girando = false;
+
+  function dibujarRuleta() {
+    const numSectores = sectores.length;
+    const arc = (2 * Math.PI) / numSectores;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const radius = cx - 16;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    sectores.forEach((sec, i) => {
+      const angle = currentAngle + (i * arc);
+      ctx.beginPath();
+      ctx.fillStyle = sec.color;
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, angle, angle + arc);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle + arc / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillText(sec.text, radius - 24, 8);
+      ctx.restore();
+    });
+  }
+  dibujarRuleta();
+
+  async function girarRuleta() {
+    if (girando) return;
+    girando = true;
+    spinBtn.disabled = true;
+    resDiv.innerHTML = "<p style='color:#ffd700; font-size:0.9rem;'>Validando conexión...</p>";
+
+    let userIp = "";
+    try {
+      const resIp = await fetch("https://api.ipify.org?format=json");
+      const dataIp = await resIp.json();
+      userIp = dataIp.ip;
+    } catch(e) {
+      console.warn("IP directa no disponible");
+    }
+
+    const forzar = localStorage.getItem("admin_forzar_premio") === "true";
+    localStorage.removeItem("admin_forzar_premio");
+
+    let targetType = "nada";
+    let nombrePremio = "NO PREMIO";
+
+    try {
+      const res = await fetch(`${GOOGLE_SCRIPT_URL}?ip=${encodeURIComponent(userIp)}&admin=${forzar}`);
+      const data = await res.json();
+
+      if (data.status !== "OK") {
+        alert(data.mensaje);
+        resDiv.innerHTML = `<p style="color:#f87171; font-weight:bold; font-size:0.9rem;">${data.mensaje}</p>`;
+        spinBtn.disabled = false;
+        girando = false;
+        return;
+      }
+
+      targetType = data.targetType;
+      nombrePremio = data.nombrePremio;
+    } catch(err) {
+      alert("Error de conexión. Inténtalo de nuevo.");
+      spinBtn.disabled = false;
+      girando = false;
+      resDiv.innerHTML = "";
+      return;
+    }
+
+    resDiv.innerHTML = "";
+
+    const sectoresValidos = [];
+    sectores.forEach((sec, idx) => {
+      if (sec.type === targetType) sectoresValidos.push(idx);
+    });
+    const elegidoIdx = sectoresValidos[Math.floor(Math.random() * sectoresValidos.length)] || 0;
+
+    const arc = (2 * Math.PI) / sectores.length;
+    const vueltas = 5 * 2 * Math.PI;
+    const anguloDestino = (3 * Math.PI / 2) - (elegidoIdx * arc) - (arc / 2);
+    const anguloFinal = currentAngle + vueltas + ((anguloDestino - (currentAngle % (2 * Math.PI)) + 4 * Math.PI) % (2 * Math.PI));
+
+    const inicio = performance.now();
+    const duracion = 4500;
+    const anguloInicial = currentAngle;
+
+    function animar(ahora) {
+      const transcurrido = ahora - inicio;
+      const progreso = Math.min(transcurrido / duracion, 1);
+      const easeOut = 1 - Math.pow(1 - progreso, 3);
+      currentAngle = anguloInicial + (anguloFinal - anguloInicial) * easeOut;
+      dibujarRuleta();
+
+      if (progreso < 1) {
+        requestAnimationFrame(animar);
+      } else {
+        girando = false;
+        if (targetType === "nada") {
+          resDiv.innerHTML = "<p style='color:#ddd; font-weight:bold;'>¡No hubo suerte! Gracias por participar.</p>";
+        } else {
+          resDiv.innerHTML = `<p style='color:#4ade80; font-size:1.1rem; font-weight:bold;'>🎉 ¡PREMIO: ${nombrePremio}! Muéstralo en barra.</p>`;
+        }
+      }
+    }
+    requestAnimationFrame(animar);
+  }
+
+  // Panel Secreto (5 toques)
+  let toques = 0;
+  let timerToques;
+  document.getElementById("adminTrigger").addEventListener("click", () => {
+    toques++;
+    clearTimeout(timerToques);
+    timerToques = setTimeout(() => { toques = 0; }, 1500);
+    if (toques >= 5) {
+      toques = 0;
+      const clave = prompt("Introduce el PIN de Administrador:");
+      if (clave === PIN_ADMIN) {
+        document.getElementById("adminModal").style.display = "flex";
+      } else if (clave !== null) {
+        alert("PIN incorrecto");
+      }
+    }
+  });
+
+  function activarPremioForzado() {
+    localStorage.setItem("admin_forzar_premio", "true");
+    alert("🎁 ¡Premio forzado listo para la siguiente tirada en este móvil!");
+    cerrarAdmin();
+  }
+  function cerrarAdmin() {
+    document.getElementById("adminModal").style.display = "none";
+  }
+</script>
+</body>
+</html>
