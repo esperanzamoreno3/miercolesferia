@@ -141,6 +141,7 @@
   </footer>
 </div>
 
+<!-- Modal Administrador Secreto -->
 <div class="admin-modal" id="adminModal">
   <div class="admin-content">
     <h3 style="color:#ffd700; margin-bottom:12px;">🛡️ Panel Administrador</h3>
@@ -150,7 +151,7 @@
 </div>
 
 <script>
-  // Pega aquí la URL que copiaste de Google Apps Script:
+  // PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT (DEBE TERMINAR EN /exec)
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYsVtkMdx3pQLdSsY7nptXxdbyGHHiyUnLHTVd9nP06AHrIiTQSO-jbqwwh99c3JzTzw/exec";
   const PIN_ADMIN = "2024";
 
@@ -208,24 +209,32 @@
     spinBtn.disabled = true;
     resDiv.innerHTML = "<p style='color:#ffd700; font-size:0.9rem;'>Validando conexión...</p>";
 
+    // 1. Detección de IP con timeout rápido
     let userIp = "";
     try {
       const resIp = await fetch("https://api.ipify.org?format=json");
       const dataIp = await resIp.json();
-      userIp = dataIp.ip;
+      userIp = dataIp.ip || "";
     } catch(e) {
       console.warn("IP directa no disponible");
     }
 
+    // 2. Comprobar si administradora forzó premio
     const forzar = localStorage.getItem("admin_forzar_premio") === "true";
     localStorage.removeItem("admin_forzar_premio");
 
+    // 3. Consulta a Google Apps Script con redirección permitida (para Safari / iPhone)
     let targetType = "nada";
     let nombrePremio = "NO PREMIO";
 
     try {
-      const res = await fetch(`${GOOGLE_SCRIPT_URL}?ip=${encodeURIComponent(userIp)}&admin=${forzar}`);
-      const data = await res.json();
+      const endpoint = `${GOOGLE_SCRIPT_URL}?ip=${encodeURIComponent(userIp)}&admin=${forzar}`;
+      const response = await fetch(endpoint, {
+        method: "GET",
+        mode: "cors",
+        redirect: "follow"
+      });
+      const data = await response.json();
 
       if (data.status !== "OK") {
         alert(data.mensaje);
@@ -238,7 +247,7 @@
       targetType = data.targetType;
       nombrePremio = data.nombrePremio;
     } catch(err) {
-      alert("Error de conexión. Inténtalo de nuevo.");
+      alert("Error de conexión con el servidor. Inténtalo de nuevo.");
       spinBtn.disabled = false;
       girando = false;
       resDiv.innerHTML = "";
@@ -247,6 +256,7 @@
 
     resDiv.innerHTML = "";
 
+    // 4. Giro visual de la ruleta
     const sectoresValidos = [];
     sectores.forEach((sec, idx) => {
       if (sec.type === targetType) sectoresValidos.push(idx);
@@ -283,7 +293,7 @@
     requestAnimationFrame(animar);
   }
 
-  // Panel Secreto (5 toques)
+  // Panel Secreto de Administrador (5 toques en el logo)
   let toques = 0;
   let timerToques;
   document.getElementById("adminTrigger").addEventListener("click", () => {
