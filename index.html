@@ -166,6 +166,21 @@
       margin-top: 10px;
       min-height: 20px;
     }
+
+    /* AVISO INTEGRADO ELEGANTE (SIN POP-UP DEL NAVEGADOR) */
+    .banner-aviso {
+      display: none;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
     .admin-modal {
       display: none;
       position: fixed;
@@ -213,6 +228,9 @@
 
   <button class="btn" id="spinBtn" onclick="girarRuleta()">¡PROBAR SUERTE!</button>
 
+  <!-- BANNER PARA MENSAJES DE ERROR/HORARIO/IP DENTRO DEL DISEÑO -->
+  <div class="banner-aviso" id="bannerAviso"></div>
+
   <div class="premio-box" id="premioBox">
     <div class="premio-titulo" id="premioTitulo">🎉 ¡PREMIO!</div>
     <div class="premio-sub">Muestra este ticket al camarero para que lo valide deslizando:</div>
@@ -258,6 +276,7 @@
   const resDiv = document.getElementById("resultado");
   const premioBox = document.getElementById("premioBox");
   const premioTitulo = document.getElementById("premioTitulo");
+  const bannerAviso = document.getElementById("bannerAviso");
 
   let currentAngle = 0;
   let girando = false;
@@ -292,11 +311,26 @@
   }
   dibujarRuleta();
 
+  function mostrarAviso(mensaje, esExito = false) {
+    bannerAviso.innerHTML = mensaje;
+    bannerAviso.style.display = "block";
+    if (esExito) {
+      bannerAviso.style.background = "rgba(34, 197, 94, 0.2)";
+      bannerAviso.style.borderColor = "#22c55e";
+      bannerAviso.style.color = "#86efac";
+    } else {
+      bannerAviso.style.background = "rgba(239, 68, 68, 0.2)";
+      bannerAviso.style.borderColor = "#ef4444";
+      bannerAviso.style.color = "#fca5a5";
+    }
+  }
+
   async function girarRuleta() {
     if (girando) return;
     girando = true;
     spinBtn.disabled = true;
     premioBox.style.display = "none";
+    bannerAviso.style.display = "none";
     resDiv.innerHTML = "<p style='color:#ffd700; font-size:0.9rem;'>Validando conexión...</p>";
 
     let userIp = "";
@@ -318,8 +352,8 @@
       const data = await response.json();
 
       if (data.status !== "OK") {
-        alert(data.mensaje);
-        resDiv.innerHTML = `<p style="color:#f87171; font-weight:bold; font-size:0.9rem;">${data.mensaje}</p>`;
+        resDiv.innerHTML = "";
+        mostrarAviso(data.mensaje);
         spinBtn.disabled = true;
         spinBtn.textContent = "BLOQUEADO";
         girando = false;
@@ -329,7 +363,7 @@
       targetType = data.targetType;
       nombrePremio = data.nombrePremio;
     } catch(err) {
-      alert("Error de conexión. Inténtalo de nuevo.");
+      mostrarAviso("⚠️ Error de conexión con el servidor. Inténtalo de nuevo.");
       spinBtn.disabled = false;
       girando = false;
       resDiv.innerHTML = "";
@@ -419,7 +453,7 @@
       sliderText.textContent = "✔ PREMIO CANJEADO";
       sliderTrack.style.background = "#15803d";
       sliderTrack.style.pointerEvents = "none";
-      alert("✅ Premio validado y canjeado en la barra.");
+      mostrarAviso("✅ Premio validado y canjeado en la barra.", true);
     }
   }
 
@@ -451,7 +485,7 @@
       if (clave === PIN_ADMIN) {
         document.getElementById("adminModal").style.display = "flex";
       } else if (clave !== null) {
-        alert("PIN incorrecto");
+        mostrarAviso("❌ PIN de administrador incorrecto");
       }
     }
   });
@@ -462,7 +496,8 @@
     spinBtn.disabled = false;
     spinBtn.textContent = "¡PROBAR SUERTE!";
     premioBox.style.display = "none";
-    alert("🎁 ¡Premio forzado listo para la siguiente tirada!");
+    bannerAviso.style.display = "none";
+    mostrarAviso("🎁 ¡Premio forzado listo para la siguiente tirada!", true);
     cerrarAdmin();
   }
   function cerrarAdmin() {
@@ -470,4 +505,4 @@
   }
 </script>
 </body>
-</html> 
+</html>  
