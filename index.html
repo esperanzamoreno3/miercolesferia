@@ -8,16 +8,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       width: 100%;
-      min-height: 100%;
+      min-height: 100vh;
       background: radial-gradient(circle, #2e1065 0%, #0f051d 100%);
       color: #fff;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    body {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
+      padding: 10px;
     }
     .card {
       background: rgba(255, 255, 255, 0.08);
@@ -25,46 +23,45 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 20px;
-      padding: 24px 16px;
-      max-width: 440px;
+      padding: 18px 14px;
+      max-width: 380px;
       width: 100%;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      margin: auto;
     }
     .logo-header {
-      width: 85px;
-      height: 85px;
+      width: 75px;
+      height: 75px;
       border-radius: 50%;
       object-fit: cover;
-      margin: 0 auto 10px;
+      margin: 0 auto 8px;
       display: block;
       cursor: pointer;
       border: 2px solid #ffd700;
       -webkit-tap-highlight-color: transparent;
     }
     h1 {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       color: #ffd700;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       letter-spacing: 1px;
     }
     .dia-tag {
       background: linear-gradient(135deg, #7c3aed, #a855f7);
       color: #fff;
       font-weight: 700;
-      font-size: 0.8rem;
-      padding: 5px 14px;
+      font-size: 0.75rem;
+      padding: 4px 12px;
       border-radius: 20px;
       display: inline-block;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       box-shadow: 0 2px 8px rgba(168,85,247,0.3);
     }
     .wheel-container {
       position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 10px auto 14px;
+      width: 270px;
+      height: 270px;
+      margin: 8px auto 12px;
     }
     #wheel {
       width: 100%;
@@ -73,9 +70,404 @@
     }
     .pointer {
       position: absolute;
-      top: -12px;
+      top: -10px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border- 
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 22px solid #ff3b30;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+      z-index: 10;
+    }
+    .btn {
+      background: linear-gradient(135deg, #eab308, #ca8a04);
+      color: #111;
+      font-weight: 800;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 1.05rem;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 14px rgba(234,179,8,0.4);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* CAJA DE PREMIO Y BOTÓN DESLIZADOR */
+    .premio-box {
+      display: none;
+      background: rgba(34, 197, 94, 0.15);
+      border: 2px solid #22c55e;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .premio-titulo {
+      font-size: 1.15rem;
+      color: #4ade80;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .premio-sub {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+    }
+    .slider-track {
+      position: relative;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #22c55e;
+      border-radius: 35px;
+      height: 50px;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .slider-text {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #86efac;
+      letter-spacing: 0.4px;
+      pointer-events: none;
+    }
+    .slider-handle {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      bottom: 3px;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .slider-handle span {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    #resultado {
+      margin-top: 10px;
+      min-height: 20px;
+    }
+    .admin-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 16px;
+    }
+    .admin-content {
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+    }
+    .admin-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <img src="IMG_5861.jpg" alt="Caseta El Resucitado" class="logo-header" id="adminTrigger" onerror="this.style.display='none'">
+  <h1>RULETA EL RESUCITADO</h1>
+  <div class="dia-tag">MIÉRCOLES DE FERIA</div>
+  <p style="font-size: 0.85rem; color: #ddd; margin-bottom: 8px;">¡Gira y prueba tu suerte en la barra!</p>
+
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="540" height="540"></canvas>
+  </div>
+
+  <button class="btn" id="spinBtn" onclick="girarRuleta()">¡PROBAR SUERTE!</button>
+
+  <div class="premio-box" id="premioBox">
+    <div class="premio-titulo" id="premioTitulo">🎉 ¡PREMIO!</div>
+    <div class="premio-sub">Muestra este ticket al camarero para que lo valide deslizando:</div>
+    <div class="slider-track" id="sliderTrack">
+      <div class="slider-text" id="sliderText">Desliza para canjear ➔</div>
+      <div class="slider-handle" id="sliderHandle"><span>➔</span></div>
+    </div>
+  </div>
+
+  <div id="resultado"></div>
+
+  <footer style="margin-top: 14px; font-size: 0.72rem; color: rgba(255,255,255,0.4);">
+    Desarrollado por <strong style="color: rgba(255,215,0,0.65);">Esperanza Moreno</strong>
+  </footer>
+</div>
+
+<div class="admin-modal" id="adminModal">
+  <div class="admin-content">
+    <h3 style="color:#ffd700; margin-bottom:12px;">🛡️ Panel Administrador</h3>
+    <button class="admin-btn" onclick="activarPremioForzado()">🎁 Forzar Premio Siguiente Tirada</button>
+    <button class="admin-btn" style="background:#4b5563;" onclick="cerrarAdmin()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYsVtkMdx3pQLdSsY7nptXxdbyGHHiyUnLHTVd9nP06AHrIiTQSO-jbqwwh99c3JzTzw/exec";
+  const PIN_ADMIN = "2024";
+
+  const sectores = [
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "1 CHUPITO", color: "#7c3aed", type: "chupito" },
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "-2€ CUBATA", color: "#2563eb", type: "dto_cubata" },
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "CUBATA GRATIS", color: "#ca8a04", type: "cubata_gratis" },
+    { text: "SUERTE", color: "#1e1e24", type: "nada" },
+    { text: "-1,50€ REBUJITO", color: "#059669", type: "dto_rebujito" }
+  ];
+
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+  const spinBtn = document.getElementById("spinBtn");
+  const resDiv = document.getElementById("resultado");
+  const premioBox = document.getElementById("premioBox");
+  const premioTitulo = document.getElementById("premioTitulo");
+
+  let currentAngle = 0;
+  let girando = false;
+
+  function dibujarRuleta() {
+    const numSectores = sectores.length;
+    const arc = (2 * Math.PI) / numSectores;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const radius = cx - 14;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    sectores.forEach((sec, i) => {
+      const angle = currentAngle + (i * arc);
+      ctx.beginPath();
+      ctx.fillStyle = sec.color;
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, angle, angle + arc);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle + arc / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillText(sec.text, radius - 20, 7);
+      ctx.restore();
+    });
+  }
+  dibujarRuleta();
+
+  async function girarRuleta() {
+    if (girando) return;
+    girando = true;
+    spinBtn.disabled = true;
+    premioBox.style.display = "none";
+    resDiv.innerHTML = "<p style='color:#ffd700; font-size:0.9rem;'>Validando conexión...</p>";
+
+    let userIp = "";
+    try {
+      const resIp = await fetch("https://api.ipify.org?format=json");
+      const dataIp = await resIp.json();
+      userIp = dataIp.ip || "";
+    } catch(e) {}
+
+    const forzar = localStorage.getItem("admin_forzar_premio") === "true";
+    localStorage.removeItem("admin_forzar_premio");
+
+    let targetType = "nada";
+    let nombrePremio = "NO PREMIO";
+
+    try {
+      const endpoint = `${GOOGLE_SCRIPT_URL}?ip=${encodeURIComponent(userIp)}&admin=${forzar}`;
+      const response = await fetch(endpoint, { method: "GET", mode: "cors", redirect: "follow" });
+      const data = await response.json();
+
+      if (data.status !== "OK") {
+        alert(data.mensaje);
+        resDiv.innerHTML = `<p style="color:#f87171; font-weight:bold; font-size:0.9rem;">${data.mensaje}</p>`;
+        spinBtn.disabled = true;
+        spinBtn.textContent = "BLOQUEADO";
+        girando = false;
+        return;
+      }
+
+      targetType = data.targetType;
+      nombrePremio = data.nombrePremio;
+    } catch(err) {
+      alert("Error de conexión. Inténtalo de nuevo.");
+      spinBtn.disabled = false;
+      girando = false;
+      resDiv.innerHTML = "";
+      return;
+    }
+
+    resDiv.innerHTML = "";
+
+    const sectoresValidos = [];
+    sectores.forEach((sec, idx) => {
+      if (sec.type === targetType) sectoresValidos.push(idx);
+    });
+    const elegidoIdx = sectoresValidos[Math.floor(Math.random() * sectoresValidos.length)] || 0;
+
+    const arc = (2 * Math.PI) / sectores.length;
+    const vueltas = 5 * 2 * Math.PI;
+    const anguloDestino = (3 * Math.PI / 2) - (elegidoIdx * arc) - (arc / 2);
+    const anguloFinal = currentAngle + vueltas + ((anguloDestino - (currentAngle % (2 * Math.PI)) + 4 * Math.PI) % (2 * Math.PI));
+
+    const inicio = performance.now();
+    const duracion = 4500;
+    const anguloInicial = currentAngle;
+
+    function animar(ahora) {
+      const transcurrido = ahora - inicio;
+      const progreso = Math.min(transcurrido / duracion, 1);
+      const easeOut = 1 - Math.pow(1 - progreso, 3);
+      currentAngle = anguloInicial + (anguloFinal - anguloInicial) * easeOut;
+      dibujarRuleta();
+
+      if (progreso < 1) {
+        requestAnimationFrame(animar);
+      } else {
+        girando = false;
+        if (targetType === "nada") {
+          resDiv.innerHTML = "<p style='color:#ddd; font-weight:bold;'>¡No hubo suerte! Gracias por participar.</p>";
+          spinBtn.disabled = true;
+          spinBtn.textContent = "TIRADA REALIZADA";
+        } else {
+          spinBtn.style.display = "none";
+          premioTitulo.textContent = `🎉 ¡${nombrePremio.toUpperCase()}!`;
+          premioBox.style.display = "block";
+          reiniciarDeslizador();
+        }
+      }
+    }
+    requestAnimationFrame(animar);
+  }
+
+  // DESLIZADOR TÁCTIL PARA CANJEAR
+  const sliderTrack = document.getElementById("sliderTrack");
+  const sliderHandle = document.getElementById("sliderHandle");
+  const sliderText = document.getElementById("sliderText");
+  let isDragging = false;
+  let startX = 0;
+  let canjeado = false;
+
+  function reiniciarDeslizador() {
+    canjeado = false;
+    sliderTrack.style.pointerEvents = "auto";
+    sliderTrack.style.background = "rgba(0, 0, 0, 0.5)";
+    sliderText.textContent = "Desliza para canjear ➔";
+    sliderHandle.style.transform = "translateX(0px)";
+  }
+
+  function startDrag(e) {
+    if (canjeado) return;
+    isDragging = true;
+    startX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+    sliderHandle.style.transition = "none";
+  }
+
+  function onDrag(e) {
+    if (!isDragging || canjeado) return;
+    const clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+    const maxDelta = sliderTrack.clientWidth - sliderHandle.clientWidth - 6;
+    let delta = clientX - startX;
+    if (delta < 0) delta = 0;
+    if (delta > maxDelta) delta = maxDelta;
+
+    sliderHandle.style.transform = `translateX(${delta}px)`;
+
+    if (delta >= maxDelta * 0.90) {
+      isDragging = false;
+      canjeado = true;
+      sliderHandle.style.transform = `translateX(${maxDelta}px)`;
+      sliderText.textContent = "✔ PREMIO CANJEADO";
+      sliderTrack.style.background = "#15803d";
+      sliderTrack.style.pointerEvents = "none";
+      alert("✅ Premio validado y canjeado en la barra.");
+    }
+  }
+
+  function endDrag() {
+    if (!isDragging || canjeado) return;
+    isDragging = false;
+    sliderHandle.style.transition = "transform 0.25s ease-out";
+    sliderHandle.style.transform = "translateX(0px)";
+  }
+
+  sliderHandle.addEventListener("mousedown", startDrag);
+  window.addEventListener("mousemove", onDrag);
+  window.addEventListener("mouseup", endDrag);
+
+  sliderHandle.addEventListener("touchstart", startDrag, { passive: true });
+  window.addEventListener("touchmove", onDrag, { passive: true });
+  window.addEventListener("touchend", endDrag);
+
+  // Panel Secreto (5 toques)
+  let toques = 0;
+  let timerToques;
+  document.getElementById("adminTrigger").addEventListener("click", () => {
+    toques++;
+    clearTimeout(timerToques);
+    timerToques = setTimeout(() => { toques = 0; }, 1500);
+    if (toques >= 5) {
+      toques = 0;
+      const clave = prompt("Introduce el PIN de Administrador:");
+      if (clave === PIN_ADMIN) {
+        document.getElementById("adminModal").style.display = "flex";
+      } else if (clave !== null) {
+        alert("PIN incorrecto");
+      }
+    }
+  });
+
+  function activarPremioForzado() {
+    localStorage.setItem("admin_forzar_premio", "true");
+    spinBtn.style.display = "block";
+    spinBtn.disabled = false;
+    spinBtn.textContent = "¡PROBAR SUERTE!";
+    premioBox.style.display = "none";
+    alert("🎁 ¡Premio forzado listo para la siguiente tirada!");
+    cerrarAdmin();
+  }
+  function cerrarAdmin() {
+    document.getElementById("adminModal").style.display = "none";
+  }
+</script>
+</body>
+</html> 
