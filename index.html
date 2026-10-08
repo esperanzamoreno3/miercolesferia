@@ -167,7 +167,7 @@
       min-height: 20px;
     }
 
-    /* AVISO INTEGRADO ELEGANTE (SIN POP-UP DEL NAVEGADOR) */
+    /* AVISO INTEGRADO ELEGANTE */
     .banner-aviso {
       display: none;
       background: rgba(239, 68, 68, 0.15);
@@ -325,8 +325,34 @@
     }
   }
 
+  // Comprobación instantánea con localStorage (60 minutos = 3600000 ms)
+  function verificarBloqueoLocal() {
+    const ultimaTirada = localStorage.getItem("ultima_tirada_feria");
+    if (ultimaTirada) {
+      const tiempoTranscurrido = Date.now() - parseInt(ultimaTirada, 10);
+      if (tiempoTranscurrido < 3600000) {
+        const minRestantes = Math.ceil((3600000 - tiempoTranscurrido) / 60000);
+        spinBtn.disabled = true;
+        spinBtn.textContent = "YA HAS JUGADO";
+        mostrarAviso(`⏳ Ya has tirado desde este móvil. Espera ${minRestantes} min para volver a jugar.`);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Ejecución inmediata al cargar la página
+  verificarBloqueoLocal();
+
   async function girarRuleta() {
     if (girando) return;
+
+    // Validación rápida local para no hacer peticiones si ya tiró
+    const esAdminCheck = localStorage.getItem("admin_forzar_premio") === "true";
+    if (!esAdminCheck && verificarBloqueoLocal()) {
+      return;
+    }
+
     girando = true;
     spinBtn.disabled = true;
     premioBox.style.display = "none";
@@ -398,6 +424,11 @@
         requestAnimationFrame(animar);
       } else {
         girando = false;
+        // Registro local para bloquear tiradas inmediatas al refrescar
+        if (!forzar) {
+          localStorage.setItem("ultima_tirada_feria", Date.now().toString());
+        }
+
         if (targetType === "nada") {
           resDiv.innerHTML = "<p style='color:#ddd; font-weight:bold;'>¡No hubo suerte! Gracias por participar.</p>";
           spinBtn.disabled = true;
@@ -491,6 +522,8 @@
   });
 
   function activarPremioForzado() {
+    // Limpia el bloqueo local para que la administradora siempre pueda tirar
+    localStorage.removeItem("ultima_tirada_feria");
     localStorage.setItem("admin_forzar_premio", "true");
     spinBtn.style.display = "block";
     spinBtn.disabled = false;
@@ -500,9 +533,10 @@
     mostrarAviso("🎁 ¡Premio forzado listo para la siguiente tirada!", true);
     cerrarAdmin();
   }
+
   function cerrarAdmin() {
     document.getElementById("adminModal").style.display = "none";
   }
 </script>
 </body>
-</html>  
+</html> 
