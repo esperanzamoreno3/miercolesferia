@@ -206,7 +206,7 @@
 </div>
 
 <script>
-  // Cambia esta URL si creas una implementación nueva en Apps Script
+  // Cambiarla si cambio base de datos
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwseAJxaW-1kQoSw6xb1ZlTl8OgGxYBjBerPDILTQ5pqZrmvKYvaq_Ie6Z26WJuGzQs/exec";
 
   const sectores = [
@@ -318,7 +318,7 @@
     let nombrePremio = "NO PREMIO";
 
     try {
-      // Revisa si en tu móvil has abierto la ruleta con tu enlace secreto personal
+      // Para resivar si en tu móvil abro la ruleta con enlace personal
       const urlParams = new URLSearchParams(window.location.search);
       const adminToken = urlParams.get("token") || "";
 
